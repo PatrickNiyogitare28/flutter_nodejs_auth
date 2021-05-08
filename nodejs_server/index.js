@@ -16,6 +16,11 @@ connectDB();
 // this takes the post body
 app.use(express.json({ extended: false }));
 
+//db initialization
+var schema = new mongoose.Schema({ email: "string", password: "string" });
+var User = mongoose.model("User", schema);
+
+
 app.get("/", (req, res) => res.send("Hello World!"));
 // signup route api
 app.post("/signup", async (req, res) => {
@@ -23,9 +28,7 @@ app.post("/signup", async (req, res) => {
   const { email, password } = req.body;
   console.log(email);
   console.log(password);
-  var schema = new mongoose.Schema({ email: "string", password: "string" });
-  var User = mongoose.model("User", schema);
-
+  
   let user = new User({
     email,
     password,
@@ -33,7 +36,7 @@ app.post("/signup", async (req, res) => {
   console.log(user);
 
   await user.save();
-  res.json({ token: "1234567890" });
+  res.status(201).json({ token: "1234567890" });
   // check db for email if email say the email is already taken
   //   return res.send("Signup api route");
 });
