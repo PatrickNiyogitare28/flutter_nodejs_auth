@@ -6,16 +6,11 @@ import 'dart:convert';
 
 import './landing_screen.dart';
 import '../models/Error.dart';
-import '../widgets/error.dart';
 
 Error error;
 
 class Signup extends StatefulWidget {
-  
-  Signup(){
-    error = new Error(false, '');
 
-  }
 
   @override
   _SignupState createState() => _SignupState();
@@ -29,6 +24,8 @@ class _SignupState extends State<Signup> {
 
   var name;
 
+  var errorMessage = "";
+
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -40,15 +37,7 @@ class _SignupState extends State<Signup> {
           restorationId: 'text_field_demo_list_view',
           padding: const EdgeInsets.all(16),
           children: [
-            
-            Stack(
-              children: [
-              (error.message == true) ? (
-                Text("Error happened.....")
-              ) : (Container()),
-                
-              ],
-            ),
+            Text(errorMessage, style: TextStyle(fontSize: 10, backgroundColor: Colors.white),),
             // ShowError(error.message),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -61,6 +50,9 @@ class _SignupState extends State<Signup> {
                 autocorrect: false,
                 onChanged: (value) {
                   name = value;
+                  setState(() {
+                    this.errorMessage="";
+                  });
                 },
               ),
             ),
@@ -75,6 +67,9 @@ class _SignupState extends State<Signup> {
                 autocorrect: false,
                 onChanged: (value) {
                   email = value;
+                  setState(() {
+                    this.errorMessage="";
+                  });
                 },
               ),
             ),
@@ -89,17 +84,18 @@ class _SignupState extends State<Signup> {
                 autocorrect: false,
                  onChanged: (value) {
                   password = value;
+                  setState(() {
+                    this.errorMessage="";
+                  });
                 },
               ),
             ),
            ElevatedButton(
              onPressed: () async{
               signup(name,email, password);
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              String token = prefs.getString("token");
-              // if(token != null){
-              //  Navigator.pushNamed(context, LandingScreen.id);
-              // }
+              // SharedPreferences prefs = await SharedPreferences.getInstance();
+              // String token = prefs.getString("token");
+              
              }, 
              child: Text("Signup"),
             )
@@ -121,16 +117,18 @@ class _SignupState extends State<Signup> {
     }),
   );
     var parse = jsonDecode(response.body);
-    print("code......."+(response.statusCode).toString());
-    print(parse);
   
   if (response.statusCode == 201) {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', parse["token"]);
-    String token = prefs.getString("token");
-    print("Token: "+token);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (contex) => LandingScreen()),
+    );
   } else if(response.statusCode == 406) {
-     new Error(true, parse["message"]);
+     setState(() {
+        this.errorMessage= parse["message"];
+      });
   }
 }
 }
