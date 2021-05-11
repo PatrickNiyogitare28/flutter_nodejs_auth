@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const argon = require('argon2');
 const jwt = require('jsonwebtoken');
 const _  = require('lodash');
+const morgan = require('morgan')
 require('dotenv').config();
 /*
  @Role : defining data to be picked by lodash
@@ -20,6 +21,11 @@ async function connectDB() {
   );
 }
 connectDB();
+
+/*
+ @Role logging triggered endpoints
+*/
+app.use(morgan('tiny'));
 
 /*
  @Role this takes the post body
